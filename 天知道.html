@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>天知道</title>
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/iconfont.css" />
+  <link rel="stylesheet" href="css/main2.css" />
+  <style>
+    .fade-enter-active,
+    .fade-leave-active
+    {
+      transition: all .5s linear;
+    }
+    .fade-enter,
+    .fade-leave-to
+    {
+      opacity: 0;
+      transform: translateY(50px)
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="search_form">
+      <div class="logo"><img src="img/logo.png" alt="logo" /></div>
+      <div class="form_group">
+        <input type="text" class="input_txt" placeholder="请输入查询的天气" v-model.trim="city" @keyup.enter="queryWeather(city)"/>
+        <button class="input_sub" :class="isLoading?'loading':''" @click="queryWeather(city)">搜 索</button>
+      </div>
+      <div class="hotkey">
+        <a href="javascript:;" @click="queryWeather('北京')">北京</a>
+        <a href="javascript:;" @click="queryWeather('上海')">上海</a>
+        <a href="javascript:;" @click="queryWeather('广州')">广州</a>
+        <a href="javascript:;" @click="queryWeather('深圳')">深圳</a>
+      </div>
+    </div>
+      <transition-group name="fade" class="weather_list" tag="ul">
+      <li v-for="(weather,index) in weatherList" :key="index+1" :style="{'transition-delay':index*100+'ms'}">
+        <div class="info_type">
+          <span class="iconfont" v-if="weather.type.includes('雨')">&#xeb87;</span>
+          <span class="iconfont" v-if="weather.type.includes('云') ">&#xeb79;</span>
+          <span class="iconfont" v-if="weather.type.includes('晴') ">&#xe933;</span>
+          <span class="iconfont" v-if="weather.type.includes('雪') ">&#xeb87;</span>
+        </div>
+        <div class="info_temp">高 <b>{{weather.high.split(' ')[1]}}</b><br />低 {{weather.low.split(' ')[1]}}</div>
+        <div class="info_date"><b>{{weather.type}}</b><span>{{weather.date}}</span></div>
+      </li>
+    </transition-group>
+  </div>
+
+  <script>
+    /*
+    <div class="tem">
+      <h2>模板</h2>
+      <!-- 小雨 -->
+      <span class="iconfont">&#xe932;</span>
+      <!-- 大雨 -->
+      <span class="iconfont">&#xe931;</span>
+      <!-- 晴 -->
+      <span class="iconfont">&#xe933;</span>
+      <!-- 雨夹雪 -->
+      <span class="iconfont">&#xe934;</span>
+      <!-- 阴天 -->
+      <span class="iconfont">&#xe92d;</span>
+      <!-- 风 -->
+      <span class="iconfont">&#xeb8c;</span>
+      <!-- 雪 -->
+      <span class="iconfont">&#xeb87;</span>
+      <!-- 多云 -->
+      <span class="iconfont">&#xeb79;</span>
+      <!-- 雷 -->
+      <span class="iconfont">&#xeb77;</span>
+      <!-- 冰雹 -->
+      <span class="iconfont">&#xeb76;</span>
+      <!-- 雾霾 -->
+      <span class="iconfont">&#xeb75;</span>
+    </div>
+    */
+  </script>
+  <script src="./js/vue.js"></script>
+  <script src="./js/axios.js"></script>
+  <script>
+    const app = new Vue({
+      el:'.wrap',
+      data:{
+        city:'',
+        isLoading:false,
+        weatherList:[]
+      },
+      methods:{
+        queryWeather(selectCity){
+          if(!!selectCity){
+            this.city = selectCity
+          }
+          console.log(selectCity);
+          
+          if(selectCity == ''){
+            alert('不能为空哦')
+            return
+          }
+          this.isLoading = true;
+          this.weatherList = []
+          axios.get(`http://wthrcdn.etouch.cn/weather_mini?city=${this.city}`)
+          .then(backData => {
+            console.log(backData);
+           this.weatherList = backData.data.data.forecast;
+           this.isLoading = false;
+          }).catch(error => {
+            console.log(error);
+            this.isLoading = false;
+            alert('没有该城市哦')
+          });
+        }
+      }
+    })
+  </script>
+
+
+</body>
+
+</html>
